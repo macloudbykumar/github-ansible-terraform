@@ -28,6 +28,7 @@ jobs:
         run: |
           echo "${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}" > gcp-service-account.json
 
+
           cat <<EOF > gcp_inventory.yml
           plugin: gcp_compute
           projects:
@@ -39,6 +40,7 @@ jobs:
           hostnames:
             - name
           EOF
+
 
           cat <<EOF > ansible.cfg
           [defaults]
@@ -59,3 +61,4 @@ jobs:
         run: |
           source venv/bin/activate
           ansible-playbook -i gcp_inventory.yml playbook.yml
+
