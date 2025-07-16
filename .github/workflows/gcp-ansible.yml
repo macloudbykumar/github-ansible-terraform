@@ -1,38 +1,61 @@
-- name: Install Ansible & dependencies
-  run: |
-    python3 -m venv venv
-    source venv/bin/activate
-    pip install ansible google-auth google-api-python-client
-    ansible-galaxy collection install google.cloud
+name: Ansible GCP Dynamic Inventory
 
-- name: Set up files
-  run: |
-    echo "${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}" > gcp-service-account.json
+on:
+  workflow_dispatch:
 
-    cat <<EOF > gcp_inventory.yml
-    plugin: gcp_compute
-    projects:
-      - galvanic-flame-466111-q8
-    zones:
-      - us-central1-c
-    auth_kind: serviceaccount
-    service_account_file: gcp-service-account.json
-    hostnames:
-      - name
-    EOF
+jobs:
+  run-ansible:
+    runs-on: self-hosted  # or ubuntu-latest if you're not using private runners
 
-    cat <<EOF > ansible.cfg
-    [defaults]
-    inventory = ./gcp_inventory.yml
-    host_key_checking = False
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
 
-    [inventory]
-    enable_plugins = gcp_compute
-    EOF
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-pip python3-venv
 
-- name: Run Ansible playbook
-  run: |
-    source venv/bin/activate
-    ansible-inventory -i gcp_inventory.yml --graph
-    ansible-playbook -i gcp_inventory.yml playbook.yml
+      - name: Set up Python virtual environment & install Ansible
+        run: |
+          python3 -m venv venv
+          source venv/bin/activate
+          pip install --upgrade pip
+          pip install ansible google-auth google-api-python-client
+          ansible-galaxy collection install google.cloud
 
+      - name: Write GCP credentials and config files
+        run: |
+          echo "${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}" > gcp-service-account.json
+
+          cat <<EOF > gcp_inventory.yml
+          plugin: gcp_compute
+          projects:
+            - galvanic-flame-466111-q8
+          zones:
+            - us-central1-c
+          auth_kind: serviceaccount
+          service_account_file: gcp-service-account.json
+          hostnames:
+            - name
+          EOF
+
+          cat <<EOF > ansible.cfg
+          [defaults]
+          inventory = ./gcp_inventory.yml
+          host_key_checking = False
+          nocows = 1
+
+          [inventory]
+          enable_plugins = gcp_compute
+          EOF
+
+      - name: Debug dynamic inventory
+        run: |
+          source venv/bin/activate
+          ansible-inventory -i gcp_inventory.yml --graph
+
+      - name: Run Ansible playbook
+        run: |
+          source venv/bin/activate
+          ansible-playbook -i gcp_inventory.yml playbook.yml
