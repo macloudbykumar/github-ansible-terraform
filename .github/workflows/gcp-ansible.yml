@@ -12,9 +12,9 @@
     cat <<EOF > gcp_inventory.yml
     plugin: gcp_compute
     projects:
-      - your-gcp-project-id
+      - galvanic-flame-466111-q8
     zones:
-      - us-central1-a
+      - us-central1-c
     auth_kind: serviceaccount
     service_account_file: gcp-service-account.json
     hostnames:
