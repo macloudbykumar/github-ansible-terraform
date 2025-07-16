@@ -1,0 +1,49 @@
+name: Install NGINX with Ansible
+
+on:
+  workflow_dispatch:
+
+jobs:
+  setup-nginx:
+    runs-on: self-hosted
+    steps:
+      - name: Install Python and Ansible
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-pip python3-venv
+          python3 -m venv ansible-venv
+          source ansible-venv/bin/activate
+          pip install ansible
+          ansible --version
+
+      - name: Create Ansible playbook
+        run: |
+          cat <<EOF > nginx-playbook.yml
+          ---
+          - name: Install NGINX and Hello World
+            hosts: localhost
+            become: true
+            tasks:
+              - name: Install NGINX
+                apt:
+                  name: nginx
+                  state: present
+                  update_cache: true
+
+              - name: Create Hello World page
+                copy:
+                  dest: /var/www/html/index.html
+                  content: "<html><h1>Hello, World from Ansible!</h1></html>"
+
+              - name: Ensure NGINX is running
+                service:
+                  name: nginx
+                  state: started
+                  enabled: true
+          EOF
+
+      - name: Run Ansible playbook
+        run: |
+          source ansible-venv/bin/activate
+          ansible-playbook nginx-playbook.yml
+
