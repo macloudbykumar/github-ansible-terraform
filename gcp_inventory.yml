@@ -1,0 +1,10 @@
+plugin: gcp_compute
+projects:
+  - galvanic-flame-466111-q8
+auth_kind: serviceaccount
+service_account_file: gcp-service-account.json
+hostnames:
+  - name
+groups:
+  web: "'web' in labels"
+

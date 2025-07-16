@@ -1,0 +1,8 @@
+---
+- name: Ping all GCP instances
+  hosts: all
+  gather_facts: no
+  tasks:
+    - name: Ping test
+      ping:
+
