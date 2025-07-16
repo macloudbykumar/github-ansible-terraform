@@ -9,11 +9,6 @@ jobs:
     runs-on: self-hosted
 
     steps:
-      - name: Update package index
-        run: |
-          sudo apt-get update -y
-          sudo apt-get upgrade -y
-
       - name: Install Ansible
         run: |
           sudo apt-get install -y software-properties-common
