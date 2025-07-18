@@ -1,0 +1,30 @@
+name: Terraform on GCP
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  terraform:
+    name: 'Terraform Plan & Apply'
+    runs-on: self-hosted
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+
+    - name: Decode GCP Credentials
+      run: |
+        echo "${{ secrets.GCP_SA_KEY }}" | base64 --decode > gcp-key.json
+
+    - name: Terraform Init
+      run: terraform init
+
+    - name: Terraform Plan
+      run: terraform plan -var="project_id=${{ secrets.GCP_PROJECT }}" -var="region=us-central1"
+
+    - name: Terraform Apply (auto-approved)
+      run: terraform apply -auto-approve -var="project_id=${{ secrets.GCP_PROJECT }}" -var="region=us-central1"
