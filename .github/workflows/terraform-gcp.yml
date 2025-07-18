@@ -21,10 +21,6 @@ jobs:
         terraform_version: latest
         terraform_wrapper: false  # disable the wrapper to avoid Node.js dependency
 
-    - name: Decode GCP Credentials
-      run: |
-        echo "${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}" > gcp-key.json
-
     - name: Terraform Init
       run: terraform init
 
