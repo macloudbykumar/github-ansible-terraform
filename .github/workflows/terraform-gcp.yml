@@ -9,26 +9,43 @@ jobs:
     runs-on: self-hosted  # or ubuntu-latest if you're not using private runners   
 
     steps:
-    - name: Checkout Code
+    - name: Checkout repo
       uses: actions/checkout@v4
-    
-    - name: Install dependencies
-      run: sudo apt-get update && sudo apt-get install -y unzip  
+
+    - name: Install unzip
+      run: sudo apt-get update && sudo apt-get install -y unzip
+
+    - name: Restore Terraform cache
+      id: cache
+      uses: actions/cache@v4
+      with:
+        path: |
+          .terraform
+          terraform.tfstate
+        key: terraform-cache-${{ github.ref }}-${{ hashFiles('**/*.tf') }}
+        restore-keys: |
+          terraform-cache-${{ github.ref }}
 
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v3
       with:
         terraform_version: latest
-        terraform_wrapper: false  # disable the wrapper to avoid Node.js dependency
+        terraform_wrapper: false
 
     - name: Terraform Init
       run: terraform init
 
     - name: Terraform Plan
-      run: terraform plan -var="project_id=${{ secrets.GCP_PROJECT }}" -var="region=us-central1"
+      run: terraform plan -out=tfplan
 
-    #- name: Terraform Apply (auto-approved)
-    #  run: terraform apply -auto-approve -var="project_id=${{ secrets.GCP_PROJECT }}" -var="region=us-central1"
+    - name: Terraform Apply
+      run: terraform apply -auto-approve tfplan
 
-    - name: Terraform Destroy (auto-approved)
-      run: terraform destroy -auto-approve -var="project_id=${{ secrets.GCP_PROJECT }}" -var="region=us-central1"
+    - name: Save Terraform cache (post-run)
+      if: always()
+      uses: actions/cache/save@v4
+      with:
+        path: |
+          .terraform
+          terraform.tfstate
+        key: terraform-cache-${{ github.ref }}-${{ hashFiles('**/*.tf') }}
