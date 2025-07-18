@@ -23,7 +23,7 @@ jobs:
 
     - name: Decode GCP Credentials
       run: |
-        echo "${{ secrets.GCP_SA_KEY }}" | base64 --decode > gcp-key.json
+        echo "${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}" > gcp-key.json
 
     - name: Terraform Init
       run: terraform init
