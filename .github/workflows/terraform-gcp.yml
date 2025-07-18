@@ -1,13 +1,12 @@
 name: Terraform on GCP
 
 on:
-  push:
-    branches: [main]
+  workflow_dispatch:
 
 jobs:
   terraform:
     name: 'Terraform Plan & Apply'
-    runs-on: self-hosted
+    runs-on: self-hosted  # or ubuntu-latest if you're not using private runners   
 
     steps:
     - name: Checkout Code
