@@ -27,8 +27,8 @@ jobs:
     - name: Terraform Plan
       run: terraform plan -var="project_id=${{ secrets.GCP_PROJECT }}" -var="region=us-central1"
 
-    - name: Terraform Apply (auto-approved)
-      run: terraform apply -auto-approve -var="project_id=${{ secrets.GCP_PROJECT }}" -var="region=us-central1"
+    #- name: Terraform Apply (auto-approved)
+    #  run: terraform apply -auto-approve -var="project_id=${{ secrets.GCP_PROJECT }}" -var="region=us-central1"
 
     - name: Terraform Destroy (auto-approved)
       run: terraform destroy -auto-approve -var="project_id=${{ secrets.GCP_PROJECT }}" -var="region=us-central1"
