@@ -17,6 +17,9 @@ jobs:
 
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: latest
+        terraform_wrapper: false  # disable the wrapper to avoid Node.js dependency
 
     - name: Decode GCP Credentials
       run: |
