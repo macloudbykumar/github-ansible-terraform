@@ -36,10 +36,10 @@ jobs:
       run: terraform init
 
     - name: Terraform Plan
-      run: terraform plan -out=tfplan
+      run: terraform plan -var="project_id=${{ secrets.GCP_PROJECT }}" -var="region=us-central1" -out=tfplan
 
     - name: Terraform Apply
-      run: terraform apply -auto-approve tfplan
+      run: terraform apply -var="project_id=${{ secrets.GCP_PROJECT }}" -var="region=us-central1" -auto-approve tfplan
 
     - name: Save Terraform cache (post-run)
       if: always()
